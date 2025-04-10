@@ -198,4 +198,4 @@ This README utilizes custom emojis and styling to create an engaging and clear g
 
 Happy coding! 🚀✨
 
-This documentation is maintained by the Event Manager team. For further questions or contributions, please submit an issue or pull request on GitHub.
+For further questions or contributions, please submit an issue or pull request on GitHub.
