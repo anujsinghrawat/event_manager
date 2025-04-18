@@ -13,7 +13,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func AuthProctected(db *gorm.DB) fiber.Handler {
+func AuthProtected(db *gorm.DB) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		authHeader := ctx.Get("Authorization")
 		if authHeader == "" {

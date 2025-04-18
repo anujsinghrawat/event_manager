@@ -11,7 +11,7 @@ type AuthRepository struct {
 	db *gorm.DB
 }
 
-func (r *AuthRepository) RegisterUser(c context.Context, registerData *models.AuthCredential) (*models.User, error) {
+func (r *AuthRepository) RegisterUser(c context.Context, registerData *models.RegisterUser) (*models.User, error) {
 	user := &models.User{
 		Email:    registerData.Email,
 		Password: registerData.Password,

@@ -56,7 +56,7 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 }
 
 func (h *AuthHandler) Register(c *fiber.Ctx) error {
-	creds := &models.AuthCredential{}
+	creds := &models.RegisterUser{}
 	context, cancel := context.WithTimeout(context.Background(), time.Duration(5*time.Second))
 	defer cancel()
 

@@ -46,7 +46,7 @@ func (s *AuthService) Login(ctx context.Context, loginData *models.AuthCredentia
 
 }
 
-func (s *AuthService) Register(c context.Context, registerData *models.AuthCredential) (string, *models.User, error) {
+func (s *AuthService) Register(c context.Context, registerData *models.RegisterUser) (string, *models.User, error) {
 	if !models.IsValidEmail(registerData.Email) {
 		return "", nil, fmt.Errorf("Invalid email, please enter a valid email")
 	}

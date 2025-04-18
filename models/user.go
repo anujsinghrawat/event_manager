@@ -1,6 +1,10 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"context"
+
+	"gorm.io/gorm"
+)
 
 type UserRole string
 
@@ -16,9 +20,15 @@ type User struct {
 	Password string   `json:"-"` // Exclude from JSON response
 }
 
-func (u *User) AfterCreate(db *gorm.DB)(err error){
-	if u.ID == 1 {
-		db.Model(u).Update("role", Manager)
-	}
-	return
+
+type UserRepository interface {
+	GetAll(ctx context.Context) ([]*User, error)
 }
+
+// this was just fun
+// func (u *User) AfterCreate(db *gorm.DB)(err error){
+// 	if u.ID == 1 {
+// 		db.Model(u).Update("role", Manager)
+// 	}
+// 	return
+// }
