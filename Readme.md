@@ -1,5 +1,17 @@
 # 🎉 Event Manager
 
+<!-- Optional: Add your project logo or a relevant banner image here -->
+<!-- <p align="center">
+  <img src="path_to_your_logo.png" alt="Event Manager Logo" width="200"/>
+</p> -->
+
+<p align="center">
+  <a href="https://goreportcard.com/report/github.com/anujsinghrawat/event-manager"><img src="https://goreportcard.com/badge/github.com/anujsinghrawat/event-manager" alt="Go Report Card" /></a>
+  <a href="https://pkg.go.dev/github.com/anujsinghrawat/event-manager"><img src="https://pkg.go.dev/badge/github.com/anujsinghrawat/event-manager.svg" alt="Go Reference"></a>
+  <!-- Replace with actual license badge once a LICENSE file is added -->
+  <a href="LICENSE.md"><img src="https://img.shields.io/badge/license-Not%20Specified-lightgrey" alt="License" /></a>
+</p>
+
 **Event Manager** is a modern, robust, and fully-featured event management portal built in Go with [Fiber](https://gofiber.io). It allows users to authenticate, create and manage events, and even generate tickets with QR codes. Perfect for organizing events, tracking attendance, and providing smooth user experiences!
 
 ---
@@ -38,7 +50,7 @@
 │   ├── events.go        # Event CRUD endpoints
 │   └── tickets.go       # Ticket management and QR code generation
 ├── middlewares/         # Custom middleware such as auth protection
-    └── auth-proctected.go  # Auth middleware
+    └── auth-protected.go  # Auth middleware
 ├── models/              # Data models (Event, Ticket, Auth, etc.)
 ├── repositories/        # Database interaction logic for various models
     ├── auth.go          # Auth repository
@@ -60,41 +72,87 @@ Follow these steps to set up the project on your local machine:
 
 ### Clone the Repository
 ```bash
-git clone https://github.com/your_username/event-manager.git
+git clone https://github.com/YOUR_GITHUB_USERNAME/event-manager.git
+# Replace YOUR_GITHUB_USERNAME with your actual GitHub username if you've forked it,
+# or use the original repository URL: https://github.com/anujsinghrawat/event-manager.git
 cd event-manager
 ```
 
 ### Set Up Environment Variables
 Create a `.env` file in the project root with the following variables (adjust as needed):
 ```env
-DB_HOST=your_db_host
-DB_NAME=your_db_name
+# Server Configuration
+SERVER_PORT=3000
+APP_ENV=dev # Use 'dev' for development, 'prod' for production
+
+# Database Configuration
+# If using Docker Compose (e.g., with 'make start'), DB_HOST should typically be the service name defined in docker-compose.yml (e.g., event-manager-db)
+# If running the Go application locally and connecting to a local PostgreSQL instance, DB_HOST is usually 'localhost'
+DB_HOST=event-manager-db 
+DB_NAME=your_db_name 
 DB_USER=your_db_user
 DB_PASSWORD=your_db_password
-SERVER_PORT=3000
-APP_ENV=dev
+DB_SSLMODE=disable # Set to 'require' or other preferred modes in production if SSL is configured for your DB
+
+# JWT Configuration
+JWT_SECRET=your_super_secret_and_strong_jwt_key # Change this to a long, random string for security
 ```
 
-### Install Dependencies
-Make sure you have Go installed, then install the necessary packages:
-```bash
-go mod tidy
-```
+### Running the Application
+There are two main ways to run the application: using Docker (recommended for ease of setup) or running natively with Go.
 
-### Run the Application (Development Mode)
-The project uses Air for hot reloading during development:
-```bash
-# Ensure Air is installed: go get -u github.com/cosmtrek/air
-air -c .air.toml
-```
+#### Using Docker (Recommended)
+This project includes a `Makefile` to simplify Docker operations. Ensure Docker and Docker Compose are installed on your system.
 
-Alternatively, you can run the app using:
-```bash
-go run main.go
-```
+1.  **Set up Environment Variables**: Make sure you have created and configured your `.env` file as described in the "Set Up Environment Variables" section above. The `docker-compose.yml` file is configured to pass these variables to the application container.
 
-### Access the App
-Open your browser and navigate to: http://localhost:3000 to see the beautiful welcome page.
+2.  **Start the application**:
+    ```bash
+    make start
+    ```
+    This command builds the Docker images (if not already built) and starts the application and the PostgreSQL database in detached mode.
+
+3.  **Access the app**:
+    Open your browser and navigate to: `http://localhost:YOUR_SERVER_PORT` (e.g., `http://localhost:3000` if `SERVER_PORT=3000`).
+
+4.  **View logs**:
+    ```bash
+    docker-compose logs -f
+    ```
+
+5.  **Stop the application**:
+    ```bash
+    make stop
+    ```
+    This command stops and removes the containers and the network. The database volume will persist by default.
+
+**Alternative Docker Compose Commands:**
+If you prefer not to use the `Makefile`, you can use `docker-compose` commands directly:
+- To build and start: `docker-compose up --build -d`
+- To stop: `docker-compose down` (add `-v` to remove volumes)
+
+#### Natively with Go (Local Development)
+If you prefer to run the application directly on your machine without Docker:
+
+1.  **Install Go**: Ensure Go (version listed in `go.mod` or newer, e.g., 1.23.5+) is installed on your system.
+2.  **Set up PostgreSQL**: Make sure you have a PostgreSQL instance running and accessible. Configure the connection details (`DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_SSLMODE`) in your `.env` file. For `DB_HOST`, you'll likely use `localhost`.
+3.  **Set up Environment Variables**: Create and configure your `.env` file as described earlier.
+4.  **Install Dependencies**:
+    ```bash
+    go mod tidy
+    ```
+5.  **Run the Application with Hot Reloading (using Air)**:
+    The project uses Air for hot reloading during development.
+    ```bash
+    # Ensure Air is installed: go get -u github.com/cosmtrek/air (or follow Air's official installation guide)
+    air -c .air.toml
+    ```
+6.  **Alternatively, run without hot reloading**:
+    ```bash
+    go run cmd/api/main.go
+    ```
+7.  **Access the app**:
+    Open your browser and navigate to: `http://localhost:YOUR_SERVER_PORT` (e.g., `http://localhost:3000`).
 
 ---
 
@@ -126,9 +184,9 @@ All endpoints are prefixed with `/api/`. Below is an overview of the main routes
 Follow these steps to deploy Event Manager in a production environment:
 
 ### Prerequisites
-- Docker & Docker Compose installed on your production server
-- Properly configured environment variables (use a secure mechanism for storing secrets)
-- A production-ready PostgreSQL instance (or use the provided container if suitable)
+- Docker & Docker Compose installed on your production server.
+- **Secure Environment Variable Management**: A system for securely managing all required environment variables. This includes `JWT_SECRET` (which **must** be set to a strong, unique random string) and appropriately configured `DB_SSLMODE` (e.g., `require`, `verify-full` depending on your database setup) for secure database connections. All variables listed in the "Set Up Environment Variables" section must be present.
+- **Production-Ready PostgreSQL**: A robust PostgreSQL instance. While the `docker-compose.yml` can spin up a PostgreSQL container, for critical production environments, consider using a managed database service or a dedicated, properly secured PostgreSQL server.
 
 ### Build the Production Binary and Docker Image
 
@@ -144,8 +202,16 @@ docker build -t event-manager .
 **Option 2: Use Docker Compose for Build**
 The provided `docker-compose.yml` will automatically build your image using the Dockerfile.
 
-### Configure Environment Variables
-Ensure the `.env` file (or your chosen secrets manager) is correctly set up on your production server with the required settings (DB credentials, SERVER_PORT, etc.).
+### Configure Environment Variables for Production
+Ensure the `.env` file (or your chosen secrets management system, such as HashiCorp Vault, AWS Secrets Manager, or platform-level environment variables) is correctly set up on your production server. 
+
+**Key variables for production:**
+-   `APP_ENV=prod`
+-   A strong, unique `JWT_SECRET` (critical for security).
+-   Appropriate `DB_SSLMODE` (e.g., `require`, `verify-full`) for secure database connections.
+-   All other database credentials (`DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`) and `SERVER_PORT`.
+
+Refer to the main "Set Up Environment Variables" section for the full list and general guidance, but pay special attention to the security implications of these variables in a production context. **Do not use development default values in production, especially for `JWT_SECRET`.**
 
 ### Deploy Using Docker Compose
 In the project root, run:
@@ -196,6 +262,64 @@ This README utilizes custom emojis and styling to create an engaging and clear g
 - [Docker Documentation](https://docs.docker.com/)
 - [Air Hot Reloading](https://github.com/cosmtrek/air)
 
-Happy coding! 🚀✨
+---
 
-For further questions or contributions, please submit an issue or pull request on GitHub.
+## 🤝 Contributing
+
+Contributions are welcome and greatly appreciated! If you have an idea for an improvement or have found a bug, please feel free to contribute.
+
+Here's how you can help:
+
+1.  **Fork the Repository**: Click the 'Fork' button at the top right of this page.
+2.  **Clone Your Fork**:
+    ```bash
+    git clone https://github.com/YOUR_GITHUB_USERNAME/event-manager.git
+    cd event-manager
+    ```
+    (Replace `YOUR_GITHUB_USERNAME` with your GitHub username)
+3.  **Create a New Branch**:
+    ```bash
+    git checkout -b feature/your-amazing-feature 
+    ```
+    Or for bug fixes:
+    ```bash
+    git checkout -b fix/issue-description
+    ```
+4.  **Make Your Changes**: Implement your feature or fix the bug. Ensure your code follows the project's style and best practices.
+5.  **Commit Your Changes**:
+    ```bash
+    git add .
+    git commit -m "feat: Describe your amazing feature" 
+    # Or "fix: Describe the bug fix"
+    # Or "docs: Improved documentation"
+    ```
+    (Follow conventional commit messages if possible)
+6.  **Push to Your Fork**:
+    ```bash
+    git push origin feature/your-amazing-feature
+    ```
+7.  **Open a Pull Request**: Go to the original repository on GitHub and open a pull request from your forked branch. Provide a clear description of your changes.
+
+If you're reporting a bug, please include:
+-   Steps to reproduce the behavior.
+-   Expected behavior.
+-   Actual behavior.
+-   Screenshots (if applicable).
+
+If you're suggesting an enhancement, please outline the potential benefits.
+
+We appreciate your effort in making this project better!
+
+---
+
+## 📜 License
+
+This project is currently not licensed.
+
+It is recommended to add a `LICENSE` file to define how others can use, modify, and distribute the code. Common open-source licenses include [MIT License](https://opensource.org/licenses/MIT), [Apache License 2.0](https://opensource.org/licenses/Apache-2.0), or [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html).
+
+Once a license is chosen and a `LICENSE` file is added to the root of the project, the license badge at the top of this README should be updated accordingly (e.g., by changing `LICENSE.md` to the correct file name if different and updating the badge text/color). The current placeholder badge indicates "Not Specified".
+
+---
+
+Happy coding! 🚀✨
